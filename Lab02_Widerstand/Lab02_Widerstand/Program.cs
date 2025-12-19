@@ -4,46 +4,99 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lab02_Widerstand
+class Resistor      // Klasse = Bauplan
 {
-    class Resistor// Bauplan = Klasse
-    {   //Attribute, Member Variablen
-        private string label; //Bezeichnung, R1 etc.
-        private double value; // Wert R
-        private double toleranz; //1 Prozent etc
-        private double maxPower; // 10 f. 10 Watt
-                                 //Methoden
-                                 // Konstruktor
-        public Resistor(string label, double value, double toleranz, double maxPower)
-        {
-            this.value = value;
+    // Atribute, Member Variablen
+    private string label; // Bezeichung fpr R1,R2;...
+    private double value; //Widerstandswert
+    private double toleranz; // zb 1 für 1%, 5 für 5%
+    private double maxPower; // zb 10 für 10 Watt
 
-            this.label = label;
-            this.maxPower = maxPower;
-            this.toleranz = toleranz ;
-        }
-        public double GetValue()
-        { return value; }
-        public double CalculateCurrent(double voltage)
-        {
-            double i = voltage / value;
-            return i; }
-        public double CalculateVoltage(double current) 
-        { double u = this.value * current;
-            return current;
-        }
-        public Resistor InSerieMit(Resistor R2)
-    }
-    internal class Program
+    //Methoden
+    // Konstruktor
+    public Resistor(string label, double value, double toleranz, double maxPower)
     {
-        static void Main(string[] args)
+        this.label = label;
+        this.value = value;
+        this.toleranz = toleranz;
+        this.maxPower = maxPower;
+
+    }
+    //Zugriffmethoden Getter and Setter
+    public double GetValue()
+    {
+        return value;
+    }
+
+    public double CalculateCurrent(double voltage)
+    {
+        double Current = voltage / this.value;
+        return Current;
+    }
+    public double CalculateVoltage(double current)
+    {
+        double voltage = this.value * current;
+        return voltage;
+    }
+    public Resistor inSeriemit(Resistor r2)
+    {
+        Resistor Rges = new Resistor("Rges", this.value + r2.value, Math.Min(this.toleranz, r2.toleranz), Math.Min(this.maxPower, r2.maxPower));
+        return Rges;
+    }
+    public Resistor inParallelemit(Resistor r2)
+    {
+        double RgesValue = 1 / (1 / this.value + 1 / r2.value);
+        Resistor Rges = new Resistor("Rges", RgesValue, Math.Min(this.toleranz, r2.toleranz), Math.Min(this.maxPower, r2.maxPower));
+        return Rges;
+    }
+
+
+}
+internal class Program
+{
+    static void Main(string[] args)
+    {
+        while (true)
         {
-            //Obj sind Instanzen d. Klasse
-            Resistor R1 = new Resistor("R1",100,5,10);// obj r1 vom  typ resistor
-            Resistor R2 = new Resistor("R2",200,1,20);// obj r2...
-            
-            double current = R1.CalculateCurrent(5);
-            Resistor Rges = R1.InSerieMit(R2);
+            Console.WriteLine("Ersten Widerstand eingeben (oder 'ende'): ");
+            string input1 = Console.ReadLine();
+
+            if (input1.ToLower() == "ende")
+                break;
+
+            Console.WriteLine("Zweiten Widerstand eingeben: ");
+            string input2 = Console.ReadLine();
+
+            Console.WriteLine("Schaltung (seriell / parallel): ");
+            string schaltung = Console.ReadLine().ToLower();
+
+            double r1Value = double.Parse(input1);
+            double r2Value = double.Parse(input2);
+
+            Resistor r1 = new Resistor("R1", r1Value, 5, 10);
+            Resistor r2 = new Resistor("R2", r2Value, 5, 10);
+
+            Resistor rGes;
+
+            if (schaltung == "seriell")
+            {
+                rGes = r1.inSeriemit(r2);
+            }
+            else if (schaltung == "parallel")
+            {
+                rGes = r1.inParallelemit(r2);
+            }
+            else
+            {
+                Console.WriteLine("Unbekannte Schaltungsart!");
+                continue;
+            }
+
+            Console.WriteLine($"Gesamtwiderstand: {rGes.GetValue()} Ohm");
+            Console.WriteLine("------------------------------------");
         }
+
+        Console.WriteLine("Programm beendet.");
+        Console.ReadKey();
     }
 }
