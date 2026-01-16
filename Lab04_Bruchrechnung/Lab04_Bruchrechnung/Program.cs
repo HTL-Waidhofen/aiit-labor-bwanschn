@@ -11,23 +11,15 @@ namespace Lab04_Bruchrechnung
         static void Main(string[] args)
         {
 
-            Console.WriteLine("Eingebe");
-            string line1 = Console.ReadLine();
-            Console.WriteLine("Eingebe");
-            string line2 = Console.ReadLine();
+            Console.WriteLine("Bitte Bruchrechnung eingeben ");
+            string line = Console.ReadLine();
 
-            Bruch b1 = Bruch.Parse(line1);
-            Bruch b2 = Bruch.Parse(line2);
-          
 
-            b1.Add(b2);
 
-            b1.sub(b2);
+            Bruchrechnung b = Bruchrechnung.Parse(line);
+            
 
-            b1.div(b2) ;
-            b1.mul(b2);
-
-            Console.WriteLine(b1);
+            Console.WriteLine(b.GetResult());
             Console.ReadKey();
 
         }
