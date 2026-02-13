@@ -151,11 +151,20 @@ namespace Lab06_Labyrinth
             this.KeyDown += MainWindow_KeyDown;
         }
 
-        // jede taste -> gehe nach rechts, aber nur wenn kein wall
+        // WASD steuerung: W=oben, A=links, S=unten, D=rechts (noob style)
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
-            int nx = this.placeX + 1;
+            int nx = this.placeX;
             int ny = this.placeY;
+
+            switch (e.Key)
+            {
+                case Key.W: ny = this.placeY - 1; break; // hoch
+                case Key.S: ny = this.placeY + 1; break; // runter
+                case Key.A: nx = this.placeX - 1; break; // links
+                case Key.D: nx = this.placeX + 1; break; // rechts
+                default: return; // andere tasten ignorieren
+            }
 
             // check bounds
             if (ny < 0 || ny >= this.rows || nx < 0 || nx >= this.cols) return;
@@ -166,7 +175,9 @@ namespace Lab06_Labyrinth
 
             // move
             this.placeX = nx;
+            this.placeY = ny;
             Canvas.SetLeft(this.centerXBlock, this.placeX * this.cellSize + 1);
+            Canvas.SetTop(this.centerXBlock, this.placeY * this.cellSize + 0);
         }
     }
 }
