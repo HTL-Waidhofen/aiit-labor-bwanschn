@@ -22,50 +22,57 @@ namespace Lab06_Labyrinth
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Figur figur = null;
-        // fields für einfaches bewegliches X
+        // Wir speichern die Zeilen vom Labyrinth
         private string[] zeilen;
-        private int rows;
-        private int cols;
+        // Anzahl Reihen und Spalten
+        private int rows, cols;
+        // Pixel-Größe pro Feld
         private int cellSize = 15;
-        private TextBlock centerXBlock;
-        private int placeX;
-        private int placeY;
+        // Das Labyrinth: jede Zeile ist ein String mit Zeichen wie '#' '.' 'S' 'E'
+        // Anzahl der Reihen (rows) und Spalten (cols) im Labyrinth
+        // Pixelgröße eines Feldes auf dem Canvas (wie groß wird ein Zellen-Rechteck)
+
+        // Wand-Klasse: ganz einfach, hat Position und ein Rechteck (Visual)
+        private class Wand { public int X, Y; public Rectangle R; }
+        // Liste aller Wände (nur logische Speicherung, aber wir fügen auch das Rechteck dem Canvas hinzu)
+        private List<Wand> waende = new List<Wand>();
+
+        // Spielfigur als Objekt (unsere Figur-Klasse)
+        private Figur figur = null;
         public MainWindow()
         {
             InitializeComponent();
-            // try to read a maze file; if not found create a default 20x20 maze
+            // Versuche die Datei zu lesen, die das Labyrinth beschreibt.
+            // Wenn sie nicht da ist, machen wir ein einfaches, kleines Labyrinth.
             if (File.Exists("maze_20x20.txt"))
             {
+                // Datei gefunden, lade alle Zeilen rein
                 zeilen = File.ReadAllLines("maze_20x20.txt");
             }
             else
             {
-                // default: 20x20 with border walls and open inside, start S and end E
+                // Keine Datei: Wir bauen ein 20x20 Labyrinth selber.
+                // Ränder sind Wände (#) und innen ist Platz (.)
                 int size = 20;
                 zeilen = new string[size];
                 for (int r = 0; r < size; r++)
                 {
                     if (r == 0 || r == size - 1)
-                        zeilen[r] = new string('#', size);
+                        zeilen[r] = new string('#', size); // obere/untere wand
                     else
-                        zeilen[r] = "#" + new string('.', size - 2) + "#";
+                        zeilen[r] = "#" + new string('.', size - 2) + "#"; // seitenwände, innen frei
                 }
-                // place start and end
+                // Setze ein S (Start) und ein E (Ende) an einfache Plätze
                 char[] first = zeilen[1].ToCharArray(); first[1] = 'S'; zeilen[1] = new string(first);
                 char[] last = zeilen[size - 2].ToCharArray(); last[size - 2] = 'E'; zeilen[size - 2] = new string(last);
             }
            
             
 
-            // determine grid size
-            this.rows = zeilen.Length;
-            this.cols = zeilen.Max(l => l.TrimEnd('\r', '\n').Length);
-
-            // pixel pro zelle
-            Spielfeld.Width = this.cols * this.cellSize;
-            Spielfeld.Height = this.rows * this.cellSize;
-            this.Spielfeld.Background = Brushes.Black;
+            // Bestimme Größe und zeichne das Labyrinth. Speichere Wände in waende-Liste
+            rows = zeilen.Length;
+            cols = zeilen.Max(l => l.TrimEnd('\r', '\n').Length);
+            Spielfeld.Width = cols * cellSize; Spielfeld.Height = rows * cellSize; Spielfeld.Background = Brushes.Black;
 
             for (int y = 0; y < rows; y++)
             {
@@ -73,111 +80,72 @@ namespace Lab06_Labyrinth
                 for (int x = 0; x < cols; x++)
                 {
                     char ch = x < line.Length ? line[x] : '#';
-
-                    Rectangle cell = new Rectangle();
-                    cell.Width = cellSize - 1; // leave a 1px gap for visual separation
-                    cell.Height = cellSize - 1;
-
+                    Rectangle cell = new Rectangle { Width = cellSize - 1, Height = cellSize - 1 };
                     switch (ch)
                     {
-                        case '#':
-                            cell.Fill = Brushes.DarkSlateGray; // wall
-                            break;
-                        case 'S':
-                            cell.Fill = Brushes.Green; // start
-                            break;
-                        case 'E':
-                            cell.Fill = Brushes.Red; // end
-                            break;
-                        default:
-                            cell.Fill = Brushes.White; // path
-                            break;
+                        case '#': cell.Fill = Brushes.DarkSlateGray; break;
+                        case 'S': cell.Fill = Brushes.Green; break;
+                        case 'E': cell.Fill = Brushes.Red; break;
+                        default: cell.Fill = Brushes.White; break;
                     }
+                    Canvas.SetLeft(cell, x * cellSize); Canvas.SetTop(cell, y * cellSize); Spielfeld.Children.Add(cell);
 
-                    Canvas.SetLeft(cell, x * cellSize);
-                    Canvas.SetTop(cell, y * cellSize);
-                    Spielfeld.Children.Add(cell);
+                    if (ch == '#') // speichere Wand als Objekt
+                    {
+                        var w = new Wand() { X = x, Y = y, R = cell };
+                        waende.Add(w);
+                    }
                 }
             }
 
-            // noob: jetzt setz ich ein X in die mitte, aber nur auf dem weg (nicht auf einer wand)
-            int midX = this.cols / 2;
-            int midY = this.rows / 2;
-
-            this.placeX = midX;
-            this.placeY = midY;
-
-            // check ob mitte wand ist, wenn ja such nächstes nicht-wand feld (manhattan dist)
-            char midChar = '#';
+            // Einfaches Start-Verhalten: Figur in der Mitte, aber nicht auf einer Wand
+            int midX = cols / 2, midY = rows / 2;
+            int sx = midX, sy = midY;
             if (midY < zeilen.Length)
             {
                 string midLine = zeilen[midY].TrimEnd('\r', '\n');
-                if (midX < midLine.Length) midChar = midLine[midX];
-            }
-
-            if (midChar == '#')
-            {
-                int bestDist = int.MaxValue;
-                for (int y = 0; y < rows; y++)
+                if (midX < midLine.Length && midLine[midX] == '#')
                 {
-                    string line = zeilen[y].TrimEnd('\r', '\n');
-                    for (int x = 0; x < cols; x++)
-                    {
-                        char c = x < line.Length ? line[x] : '#';
-                        if (c != '#')
-                        {
-                            int d = Math.Abs(x - midX) + Math.Abs(y - midY);
-                            if (d < bestDist)
-                            {
-                                bestDist = d;
-                                this.placeX = x;
-                                this.placeY = y;
-                            }
-                        }
-                    }
+                    // suche erstes freies Feld (sequentiell, einfach)
+                    bool found = false;
+                    for (int y = 0; y < rows && !found; y++)
+                        for (int x = 0; x < cols && !found; x++)
+                            if ((x < zeilen[y].Length ? zeilen[y][x] : '#') != '#') { sx = x; sy = y; found = true; }
                 }
             }
-            centerXBlock = new TextBlock();
-            centerXBlock.Text = "X";
-            centerXBlock.FontWeight = FontWeights.Bold;
-            centerXBlock.Foreground = Brushes.Blue;
-            centerXBlock.FontSize = Math.Max(10, this.cellSize - 2);
-            Spielfeld.Children.Add(centerXBlock);
-            Canvas.SetLeft(centerXBlock, this.placeX * this.cellSize + 1);
-            Canvas.SetTop(centerXBlock, this.placeY * this.cellSize + 0);
 
-            // fokus setzen damit tasten ankommen
+            // Erzeuge Figur und füge deren Visual dem Canvas hinzu
+            figur = new Figur(sx, sy, cellSize - 2, cellSize - 2);
+            Spielfeld.Children.Add(figur.Visual);
+            figur.SetPositionOnCanvas(Spielfeld, cellSize);
+
+            // Fokussieren, damit KeyDown funktioniert
             this.Loaded += (s, e) => { Keyboard.Focus(this); };
+            // KeyDown ist im Code-behind (hier), XAML-Ereignis optional
             this.KeyDown += MainWindow_KeyDown;
         }
 
-        // WASD steuerung: W=oben, A=links, S=unten, D=rechts (noob style)
+        // Tasten bewegen die Figur (WASD). Wir prüfen Wände in der zeilen-Array
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
-            int nx = this.placeX;
-            int ny = this.placeY;
-
+            int nx = figur.X, ny = figur.Y;
             switch (e.Key)
             {
-                case Key.W: ny = this.placeY - 1; break; // hoch
-                case Key.S: ny = this.placeY + 1; break; // runter
-                case Key.A: nx = this.placeX - 1; break; // links
-                case Key.D: nx = this.placeX + 1; break; // rechts
-                default: return; // andere tasten ignorieren
+                case Key.W: ny--; break;
+                case Key.S: ny++; break;
+                case Key.A: nx--; break;
+                case Key.D: nx++; break;
+                default: return;
             }
 
-            // check bounds
-            if (ny < 0 || ny >= this.rows || nx < 0 || nx >= this.cols) return;
+            if (nx < 0 || nx >= cols || ny < 0 || ny >= rows) return;
+            string line = zeilen[ny].TrimEnd('\r', '\n');
+            if (nx >= line.Length) return;
+            if (line[nx] == '#') return; // wenn wand, nicht bewegen
 
-            string line = this.zeilen[ny].TrimEnd('\r', '\n');
-            if (nx >= line.Length) return; // außerhalb string -> wand
-            if (line[nx] == '#') return; // wand
-
-            // move
-            this.placeX = nx;
-            this.placeY = ny;
-            Canvas.SetLeft(this.centerXBlock, this.placeX * this.cellSize + 1);
-            Canvas.SetTop(this.centerXBlock, this.placeY * this.cellSize + 0);
+            // move figur und update visual
+            figur.MoveTo(nx, ny);
+            figur.SetPositionOnCanvas(Spielfeld, cellSize);
         }
     }
 }
