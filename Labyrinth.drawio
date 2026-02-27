@@ -1,0 +1,53 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36" version="29.5.6">
+  <diagram name="Seite-1" id="Ulad0HZnMLlLHD83wPSH">
+    <mxGraphModel dx="1226" dy="733" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="qqwHBlPXrqP9zENHfs2x-10" parent="1" style="text;whiteSpace=wrap;html=1;" value="&#xa;&#xa;    &lt;canvas&gt;&#xa;&#xa;        &#xa;        &#xa;        &#xa;            &#xa;            &#xa;            &#xa;            &#xa;            &#xa;            &#xa;            &#xa;            &#xa;            &#xa;        &#xa;&#xa;        &#xa;        &#xa;        &#xa;            &#xa;            &#xa;            &#xa;            &#xa;            &#xa;            &#xa;        &#xa;&#xa;        &#xa;        &#xa;        &#xa;            &#xa;            &#xa;            &#xa;            &#xa;            &#xa;        &#xa;&#xa;        &#xa;        &#xa;        &#xa;            &#xa;            &#xa;            &#xa;            &#xa;            &#xa;            &#xa;            &#xa;        &#xa;&#xa;        &#xa;        &#xa;        &#xa;            &#xa;            &#xa;            &#xa;            &#xa;            &#xa;            &#xa;        &#xa;&#xa;        &#xa;        &lt;/canvas&gt;&#xa;" vertex="1">
+          <mxGeometry height="210" width="330" as="geometry" />
+        </mxCell>
+        <mxCell id="qqwHBlPXrqP9zENHfs2x-11" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1e1e1e;fontColor=#ffffff;strokeColor=#ffffff;" value="MainWindow&#xa;-----------------------&#xa;figur : Figur&#xa;zeilen : string[]&#xa;Spielfeld : Canvas&#xa;placeX = 10&#xa;placeY = 8&#xa;rows = 20&#xa;cols = 20" vertex="1">
+          <mxGeometry height="220" width="260" x="40" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="qqwHBlPXrqP9zENHfs2x-12" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1e1e1e;fontColor=#ffffff;strokeColor=#ffffff;" value="Figur&#xa;-----------------------&#xa;x = 10&#xa;y = 8&#xa;cellSize = 15&#xa;geometrie : Ellipse" vertex="1">
+          <mxGeometry height="180" width="240" x="380" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="qqwHBlPXrqP9zENHfs2x-13" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1e1e1e;fontColor=#ffffff;strokeColor=#ffffff;" value="Ellipse&#xa;-----------------------&#xa;Width = 11&#xa;Height = 11&#xa;Fill = Blue" vertex="1">
+          <mxGeometry height="140" width="220" x="720" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="qqwHBlPXrqP9zENHfs2x-14" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1e1e1e;fontColor=#ffffff;strokeColor=#ffffff;" value="Canvas (Spielfeld)&#xa;-----------------------&#xa;Width = 300&#xa;Height = 300&#xa;Children:&#xa;- Rectangle (viele)&#xa;- Ellipse" vertex="1">
+          <mxGeometry height="180" width="260" x="380" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="qqwHBlPXrqP9zENHfs2x-15" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1e1e1e;fontColor=#ffffff;strokeColor=#ffffff;" value="string[] zeilen&#xa;-----------------------&#xa;[0] = #######&#xa;[1] = #S....#&#xa;[2] = #.....#&#xa;..." vertex="1">
+          <mxGeometry height="150" width="240" x="720" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="qqwHBlPXrqP9zENHfs2x-16" edge="1" parent="1" source="qqwHBlPXrqP9zENHfs2x-11" style="endArrow=block;" target="qqwHBlPXrqP9zENHfs2x-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="qqwHBlPXrqP9zENHfs2x-17" edge="1" parent="1" source="qqwHBlPXrqP9zENHfs2x-12" style="endArrow=block;strokeColor=#666666;fillColor=#f5f5f5;" target="qqwHBlPXrqP9zENHfs2x-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="qqwHBlPXrqP9zENHfs2x-18" edge="1" parent="1" source="qqwHBlPXrqP9zENHfs2x-11" style="endArrow=block;strokeColor=#ffffff;" target="qqwHBlPXrqP9zENHfs2x-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="qqwHBlPXrqP9zENHfs2x-19" edge="1" parent="1" source="qqwHBlPXrqP9zENHfs2x-11" style="endArrow=block;strokeColor=#6c8ebf;fillColor=#dae8fc;" target="qqwHBlPXrqP9zENHfs2x-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="qqwHBlPXrqP9zENHfs2x-21" edge="1" parent="1" source="qqwHBlPXrqP9zENHfs2x-11" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="490" y="440" as="sourcePoint" />
+            <mxPoint x="370" y="410" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="qqwHBlPXrqP9zENHfs2x-22" edge="1" parent="1" source="qqwHBlPXrqP9zENHfs2x-14" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.682;entryY=1.03;entryDx=0;entryDy=0;entryPerimeter=0;" target="qqwHBlPXrqP9zENHfs2x-13" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points" />
+            <mxPoint x="490" y="440" as="sourcePoint" />
+            <mxPoint x="1030" y="220" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
