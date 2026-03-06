@@ -90,11 +90,33 @@ namespace Lab06_Labyrinth
                     }
                     Canvas.SetLeft(cell, x * cellSize); Canvas.SetTop(cell, y * cellSize); Spielfeld.Children.Add(cell);
 
-                    if (ch == '#') // speichere Wand als Objekt
+                    // *** Beginn Wand-Erstellung ***
+                    // Wenn das Zeichen '#' ist, dann ist das hier eine Mauer.
+                    // Wir machen zwei Dinge:
+                    // 1) Wir malen das Rechteck (oben passiert schon die Farbwahl),
+                    // 2) Wir speichern eine logische Wand-Information in der Liste 'waende'.
+                    //
+                    // Warum speichern wir eine Wand? Damit das Programm weiß, welche
+                    // Felder nicht begehbar sind. Beim Bewegen prüfen wir später die
+                    // Zeichen in 'zeilen' (oder die Wand-Liste) und verhindern so,
+                    // dass die Spielfigur in eine Mauer läuft.
+                    //
+                    // Schritt für Schritt:
+                    // - 'ch == '#'' bedeutet: dieses Feld ist eine Mauer.
+                    // - Wir bauen ein Wand-Objekt mit den Gitter-Koordinaten X/Y
+                    //   (also Spalte x und Reihe y) und geben ihm das Rechteck R,
+                    //   das wir gerade gezeichnet haben. R ist nur für die Ansicht.
+                    // - Wir fügen das Wand-Objekt zur Liste 'waende' hinzu. Diese
+                    //   Liste ist unsere logische Sammlung aller Mauern.
+                    //
+                    // Wenn wir später die Figur bewegen, fragen wir: "Ist da eine
+                    // Wand?" Wenn ja, dann lassen wir die Figur nicht dorthin gehen.
+                    if (ch == '#')
                     {
                         var w = new Wand() { X = x, Y = y, R = cell };
                         waende.Add(w);
                     }
+                    // *** Ende Wand-Erstellung ***
                 }
             }
 
@@ -125,7 +147,33 @@ namespace Lab06_Labyrinth
             this.KeyDown += MainWindow_KeyDown;
         }
 
-        // Tasten bewegen die Figur (WASD). Wir prüfen Wände in der zeilen-Array
+        /*
+         Ganz genaue Erklärung der Variablen und was beim Drücken einer Taste passiert:
+
+         - "figur.X" / "figur.Y": Das ist die aktuelle Stelle der Spielfigur im
+            Gitter. X = Spalte, Y = Reihe.
+
+         - "nx" / "ny": Das sind die NEUEN Koordinaten, die wir zuerst nur
+            berechnen. Beispiel: Wenn die Figur rechts gehen soll, setzen wir
+            nx = figur.X + 1 und ny = figur.Y. Wir ändern also zuerst nx/ny,
+            ohne die Figur sofort zu verschieben.
+
+         - Warum zuerst nx/ny? Damit wir prüfen können, ob die Bewegung erlaubt
+            ist (z.B. nicht außerhalb des Feldes oder in eine Mauer).
+
+         - Prüfungen nach der Berechnung von nx/ny:
+            1) Ist nx/ny innerhalb des Labyrinths? (Nicht kleiner als 0 und
+               nicht größer/gleich cols bzw. rows.)
+            2) Ist an zeilen[ny][nx] eine Mauer ('#')? Wenn ja, dann darf die
+               Figur nicht dorthin. Dann machen wir nichts.
+
+         - Wenn beide Prüfungen bestanden sind, dann wird die Figur wirklich
+           nach nx/ny bewegt: figur.MoveTo(nx, ny) und die Anzeige (Visual)
+           wird auf dem Canvas aktualisiert.
+
+         Kurz: nx/ny sind nur temporäre Wunsch-Koordinaten. Nach Prüfung
+         übernehmen wir sie in die echte Position der Figur.
+        */
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
             int nx = figur.X, ny = figur.Y;
