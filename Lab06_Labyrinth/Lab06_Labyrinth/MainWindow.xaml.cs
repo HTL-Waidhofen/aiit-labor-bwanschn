@@ -395,7 +395,7 @@ namespace Lab06_Labyrinth
             {
                 // Spieler wurde gefressen
                 // Zeige spezielle Nachricht je nachdem welcher Gegner es war
-                if (hit.Id == "E2") MessageBox.Show("Du einhorn wüühhaa", "Gefressen");
+                if (hit.Id == "E2") MessageBox.Show("große klappe oba nix in da birn", "Gefressen");
                 else if (hit.Id == "E1") MessageBox.Show("du gehst mir richtig auf den sack", "Gefressen");
                 // reset player to start (zurück zur Startposition)
                 figur.MoveTo(startX, startY);
